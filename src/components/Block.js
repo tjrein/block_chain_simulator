@@ -1,19 +1,24 @@
 import React, { Component } from 'react';
 import {Form, Button} from 'semantic-ui-react';
+import sha256 from 'crypto-js/sha256';
+
 
 class Block extends Component {
   state = {
     id: 1,
     parent: 1,
     data: "",
-    hash: null
+    hash: sha256("").toString()
   };
 
   handleChange = e => {
     const value = e.target.value;
     const name = e.target.name;
 
-    this.setState({ [name]: value});
+    this.setState({
+      data: value,
+      hash: sha256(value).toString()
+    });
   }
 
   render () {
@@ -30,7 +35,6 @@ class Block extends Component {
             onChange={this.handleChange}
           />
         </Form>
-
 
         <p> {hash} </p>
       </div>
