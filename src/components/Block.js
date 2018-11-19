@@ -7,9 +7,9 @@ class Block extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      difficulty: 4,
+      difficulty: "000",
       id: 1,
-      parent: 1,
+      parent: 0,
       nonce: 0,
       data: "",
       hash: sha256("").toString()
@@ -17,14 +17,12 @@ class Block extends Component {
   }
 
   handleClick = () => {
-    const data = this.state.data;
+    const data = this.props.data;
     const difficulty = this.state.difficulty
-    let nonce = 0;
-    let hash = this.state.hash
+    let nonce = this.props.nonce;
+    let hash = this.props.hash
 
-    console.log(hash.substring(0, this.state.difficulty))
-
-    while(hash.substring(0, difficulty) !== '0000') {
+    while(hash.substring(0, difficulty.length) !== difficulty) {
       nonce++;
       hash = sha256(nonce + data).toString();
     }
