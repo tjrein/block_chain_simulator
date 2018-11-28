@@ -6,46 +6,50 @@ class Block extends Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       difficulty: "000",
-      id: 1,
-      parent: 0,
-      nonce: 0,
-      data: "",
-      hash: sha256("").toString()
+      //id: 1,
+      //parent: 0,
+      //nonce: 0,
+      //data: "",
+      //hash: sha256("").toString()
     };
   }
 
-  handleClick = () => {
-    const data = this.props.data;
-    const difficulty = this.state.difficulty
-    let nonce = this.props.nonce;
-    let hash = this.props.hash
+  //handleClick = () => {
+  //  const data = this.props.data;
+  //  const difficulty = this.state.difficulty
+  //  let nonce = this.props.nonce;
+  //  let hash = this.props.hash
 
-    while(hash.substring(0, difficulty.length) !== difficulty) {
-      nonce++;
-      hash = sha256(nonce + data).toString();
-    }
+  //  while(hash.substring(0, difficulty.length) !== difficulty) {
+  //    nonce++;
+  //    hash = sha256(nonce + data).toString();
+  //  }
 
-    this.setState({
-      hash: hash,
-      nonce: nonce
-    });
-  }
+//    this.setState({
+  //    hash: hash,
+  //    nonce: nonce
+  //  });
+//  }
 
   handleChange = e => {
-    const value = e.target.value;
-    const name = e.target.name;
-    const nonce = this.state.nonce;
+    const {uuid, data} = this.props;
+    const {value, name} = e.target;
 
-    this.setState({
-      [name]: value,
-      hash: sha256(nonce + value).toString()
-    });
+    const newState = {
+      uuid: uuid,
+      data: data,
+      value: value,
+      name: name
+    }
+
+    this.props.updateBlockchain(newState);
   }
 
   render () {
-    const {data, hash, nonce} = this.state;
+    const {data, hash, nonce} = this.props;
 
     return (
       <div className="ui container">
@@ -66,7 +70,7 @@ class Block extends Component {
             onChange={this.handleChange}
           />
         </Form>
-        <Button circular size="big" onClick={this.handleClick}>
+        <Button circular size="big">
           Mine
         </Button>
       </div>
