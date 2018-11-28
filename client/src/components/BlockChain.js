@@ -14,8 +14,19 @@ class BlockChain extends Component {
         hash: sha256("").toString(),
         data: '',
         nonce: 0
-      }]
+      }],
+      connection: "is the connection working"
     }
+  }
+
+  componentDidMount() {
+    this.testConnection();
+  }
+
+  testConnection = () => {
+    fetch('api')
+      .then(data => data.json())
+      .then(resp => this.setState({connection: resp.data}))
   }
 
   addBlock = () => {
@@ -32,10 +43,11 @@ class BlockChain extends Component {
     chain.push(block);
 
     this.setState({chain: chain});
-
   }
 
   render () {
+    const { connection } = this.state
+
     const blocks = this.state.chain.map((block) =>
       <Block {...block} />
     );
@@ -43,6 +55,7 @@ class BlockChain extends Component {
     return (
       <div>
         <div className="ui container">
+          <h1>{connection}</h1>
           <Button size="big" onClick={this.addBlock}>
             Add Block
           </Button>

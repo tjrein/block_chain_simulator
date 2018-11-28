@@ -49,7 +49,7 @@ class Block extends Component {
 
     return (
       <div className="ui container">
-        <h1>Block: {hash} </h1>
+        <h1> Block: {hash} </h1>
         <Form size="big">
           <Form.TextArea
             label = "Data"
@@ -66,11 +66,9 @@ class Block extends Component {
             onChange={this.handleChange}
           />
         </Form>
-
         <Button circular size="big" onClick={this.handleClick}>
           Mine
         </Button>
-
       </div>
     );
   }
