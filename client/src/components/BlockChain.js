@@ -40,7 +40,6 @@ class BlockChain extends Component {
       <Block {...block} />
     );
 
-
     return (
       <div>
         <div className="ui container">
