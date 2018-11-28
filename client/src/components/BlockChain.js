@@ -22,13 +22,19 @@ class BlockChain extends Component {
   }
 
    updateBlockchain = newState => {
-     let blockchain = this.state.chain
+     let blockchain = this.state.chain;
+     let update_hashes = false;
 
-     for (let block of blockchain) {
+     for (let i = 0; i < blockchain.length; i++) {
+       const block = blockchain[i];
+       const parent_block = blockchain[i-1] || null;
+
        if (newState.uuid === block.uuid) {
          block[newState.name] = newState.value;
-         block.hash = sha256(block.data + block.nonce).toString();
        }
+
+       block.hash = sha256(block.previous_hash + block.data + block.nonce).toString();
+       block.previous_hash = parent_block && parent_block.hash || null;
      }
 
      this.setState({chain: blockchain});
@@ -41,7 +47,6 @@ class BlockChain extends Component {
   }
 
   render () {
-
     const blocks = this.state.chain.map((block) =>
       <Block {...block} updateBlockchain={this.updateBlockchain} />
     );

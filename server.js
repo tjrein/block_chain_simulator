@@ -8,6 +8,7 @@ let chain = [{
   next: null,
   prev: null,
   hash: SHA256(null).toString(),
+  previous_hash: 0,
   data: "",
   nonce: 0
 }];
@@ -26,7 +27,8 @@ app.get('/api/addblock', (req, res) => {
     prev: parent_block.uuid,
     next: null,
     parent: parent_block.uuid,
-    hash: SHA256("" + 0 + parent_block.uuid).toString(),
+    hash: SHA256("" + 0 + parent_block.previous_hash).toString(),
+    previous_hash: parent_block.hash,
     data: '',
     nonce: 0
   }

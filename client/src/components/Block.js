@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Form, Button} from 'semantic-ui-react';
+import {Form, Button, Message} from 'semantic-ui-react';
 import sha256 from 'crypto-js/sha256';
 
 class Block extends Component {
@@ -49,11 +49,12 @@ class Block extends Component {
   }
 
   render () {
-    const {data, hash, nonce} = this.props;
+    const {data, hash, nonce, previous_hash} = this.props;
 
     return (
       <div className="ui container">
-        <h1> Block: {hash} </h1>
+        <h3> Previous hash: {previous_hash} </h3>
+        <h3> Hash: {hash} </h3>
         <Form size="big">
           <Form.TextArea
             label = "Data"
