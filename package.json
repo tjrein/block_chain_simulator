@@ -19,6 +19,7 @@
   "homepage": "https://github.com/tjrein/block_chain_simulator#readme",
   "dependencies": {
     "crypto-js": "^3.1.9-1",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
   }
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import sha256 from 'crypto-js/sha256';
 import Block from './Block';
 import { Button } from 'semantic-ui-react';
+import socketIOClient from 'socket.io-client'
 
 class BlockChain extends Component {
   constructor(props) {
@@ -12,7 +13,9 @@ class BlockChain extends Component {
   }
 
   componentDidMount() {
+    const io = socketIOClient()
     this.loadBloackChain()
+
   }
 
   loadBloackChain = () => {

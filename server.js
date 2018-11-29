@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
 const SHA256 = require('crypto-js/sha256');
+const http = require('http');
 const port = process.env.PORT || 5000;
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 let chain = [{
   uuid: 1,
@@ -13,7 +16,11 @@ let chain = [{
   nonce: 0
 }];
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+io.on('connection', socket => {
+  console.log('User connected!');
+});
+
+server.listen(port, () => console.log(`Listening on port ${port}`));
 
 app.get('/api/blockchain', (req, res) => {
   res.send({data: chain});
