@@ -17,7 +17,9 @@ let chain = [{
 }];
 
 io.on('connection', socket => {
-  console.log('User connected!');
+  socket.on('updateBlockchain', data => {
+    socket.broadcast.emit('updateBlockchain', data);
+  });
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));

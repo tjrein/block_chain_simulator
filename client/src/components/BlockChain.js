@@ -2,20 +2,19 @@ import React, { Component } from 'react';
 import sha256 from 'crypto-js/sha256';
 import Block from './Block';
 import { Button } from 'semantic-ui-react';
-import socketIOClient from 'socket.io-client'
+import io from 'socket.io-client';
+import update from 'immutability-helper';
 
 class BlockChain extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      chain: []
-    }
+    this.state = { chain: [] }
+    this.socket = io()
   }
 
   componentDidMount() {
-    const io = socketIOClient()
-    this.loadBloackChain()
-
+    this.loadBloackChain();
+    this.socket.on('updateBlockchain', chain => this.setState({chain: chain}));
   }
 
   loadBloackChain = () => {
@@ -24,23 +23,43 @@ class BlockChain extends Component {
       .then(resp => this.setState({chain: resp.data}))
   }
 
-   updateBlockchain = newState => {
-     let blockchain = this.state.chain;
-     let update_hashes = false;
+  handleChange = (index, e) => {
+    let block = { ...this.state.chain[index] };
+    let {name, value} = e.target;
+    block[name] = value;
+    block.hash = sha256(block.nonce + block.data + block.previous_hash).toString()
+    this.updateBlocks(index, block);
+  }
 
-     for (let i = 0; i < blockchain.length; i++) {
-       const block = blockchain[i];
-       const parent_block = blockchain[i-1] || null;
+  mineBlock = (index, e) => {
+    const difficulty = "000"
 
-       if (newState.uuid === block.uuid) {
-         block[newState.name] = newState.value;
-       }
+    let block = { ...this.state.chain[index] };
+    let { data, nonce, hash, previous_hash } = block
 
-       block.hash = sha256(block.previous_hash + block.data + block.nonce).toString();
-       block.previous_hash = parent_block && parent_block.hash || null;
-     }
+    while(hash.substring(0, difficulty.length) !== difficulty) {
+      nonce++;
+      hash = sha256(nonce + data + previous_hash).toString();
+    }
 
-     this.setState({chain: blockchain});
+    block.nonce = nonce;
+    block.hash = hash
+    this.updateBlocks(index, block);
+  }
+
+  updateBlocks = (index, block)  => {
+    let newChain = update(this.state.chain, { [index]: { $set: block } });
+
+    for (let i = index + 1; i < newChain.length; i++) {
+      let newBlock = {...newChain[i]};
+      let parent_block = {...newChain[i-1]} || null
+      newBlock.previous_hash = parent_block && parent_block.hash || null;
+      newBlock.hash = sha256(newBlock.previous_hash + newBlock.data + newBlock.nonce).toString();
+      newChain = update(newChain, { [i]: {$set: newBlock} });
+    }
+
+    this.setState({chain: newChain});
+    this.socket.emit('updateBlockchain', newChain);
   }
 
   addBlock = () => {
@@ -50,8 +69,12 @@ class BlockChain extends Component {
   }
 
   render () {
-    const blocks = this.state.chain.map((block) =>
-      <Block {...block} updateBlockchain={this.updateBlockchain} />
+    const blocks = this.state.chain.map((block, index) =>
+      <Block
+        {...block}
+        handleChange={this.handleChange.bind(this, index)}
+        mineBlock={this.mineBlock.bind(this, index)}
+      />
     );
 
     return (
