@@ -3,6 +3,7 @@ const app = express();
 const SHA256 = require('crypto-js/sha256');
 const http = require('http');
 const port = process.env.PORT || 5000;
+const host = '0.0.0.0';
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
@@ -22,7 +23,7 @@ io.on('connection', socket => {
   });
 });
 
-server.listen(port, () => console.log(`Listening on port ${port}`));
+server.listen(port, host, () => console.log(`Listening on port ${port}`));
 
 app.get('/api/blockchain', (req, res) => {
   res.send({data: chain});
