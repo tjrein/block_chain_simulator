@@ -1,26 +1,19 @@
 import React, { Component } from 'react';
 import sha256 from 'crypto-js/sha256';
 import Block from './Block';
-import { Button } from 'semantic-ui-react';
+import { Button, Container, Divider, Segment } from 'semantic-ui-react';
 import io from 'socket.io-client';
 import update from 'immutability-helper';
 
 class BlockChain extends Component {
   constructor(props) {
     super(props)
-    this.state = { chain: [] }
+    this.state = { chain: [], difficulty: "000" }
     this.socket = io()
   }
 
   componentDidMount() {
-    this.loadBloackChain();
-    this.socket.on('updateBlockchain', chain => this.setState({chain: chain}));
-  }
-
-  loadBloackChain = () => {
-    fetch('api/blockchain')
-      .then(data => data.json())
-      .then(resp => this.setState({chain: resp.data}))
+    this.socket.on('fetchBlockchain', chain => this.setState({chain:chain}));
   }
 
   handleChange = (index, e) => {
@@ -32,7 +25,7 @@ class BlockChain extends Component {
   }
 
   mineBlock = (index, e) => {
-    const difficulty = "000"
+    const difficulty = this.state.difficulty;
 
     let block = { ...this.state.chain[index] };
     let { data, nonce, hash, previous_hash } = block
@@ -62,31 +55,31 @@ class BlockChain extends Component {
     this.socket.emit('updateBlockchain', newChain);
   }
 
-  addBlock = () => {
-    fetch('api/addblock')
-      .then(data => data.json())
-      .then(resp => this.setState({chain: resp.data}))
-  }
+  addBlock = () => this.socket.emit('addBlock');
 
   render () {
     const blocks = this.state.chain.map((block, index) =>
-      <Block
-        {...block}
-        handleChange={this.handleChange.bind(this, index)}
-        mineBlock={this.mineBlock.bind(this, index)}
-      />
+      <Container>
+        <Segment compact>
+        <Block
+          {...block}
+          difficulty = {this.state.difficulty}
+          handleChange={this.handleChange.bind(this, index)}
+          mineBlock={this.mineBlock.bind(this, index)}
+        />
+        </Segment>
+        <Divider hidden />
+      </Container>
     );
 
     return (
       <div>
-        <div className="ui container">
+        {blocks}
+        <Container>
           <Button size="big" onClick={this.addBlock}>
             Add Block
           </Button>
-        </div>
-        <div className="ui container">
-          {blocks}
-        </div>
+        </Container>
       </div>
     )
   }
