@@ -1,4 +1,4 @@
-//import Block from "./Block.js";
+import Block from "./Block.js";
 const express = require('express');
 const app = express();
 const SHA256 = require('crypto-js/sha256');
@@ -11,14 +11,19 @@ const io = require('socket.io')(server);
 
 let connections = [];
 
-let chain = [{
-  uuid: 1,
-  next: null,
-  hash: SHA256(null).toString(),
-  previous_hash: "00000000000",
-  data: "Hello",
-  nonce: 0
-}];
+//let chain = [{
+//  uuid: 1,
+//  next: null,
+//  hash: SHA256(null).toString(),
+//  previous_hash: "00000000000",
+//  data: "Hello",
+//  nonce: 0
+//}];
+
+let chain = [
+  new Block(1, "This is a test", "000")
+];
+
 
 io.on('connection', socket => {
   connections.push(socket);
@@ -27,16 +32,18 @@ io.on('connection', socket => {
 
   socket.on('addBlock', () => {
     const parent_block = chain[chain.length -1]
-    let block = {
-      uuid: parent_block.uuid + 1,
-      prev: parent_block.uuid,
-      next: null,
-      parent: parent_block.uuid,
-      hash: SHA256("" + 0 + parent_block.previous_hash).toString(),
-      previous_hash: parent_block.hash,
-      data: '',
-      nonce: 0
-    }
+
+    let block = new Block(parent_block.id + 1, "daatata", parent_block.hash);
+    //let block = {
+    //  uuid: parent_block.uuid + 1,
+    //  prev: parent_block.uuid,
+    //  next: null,
+    //  parent: parent_block.uuid,
+    //  hash: SHA256("" + 0 + parent_block.previous_hash).toString(),
+    //  previous_hash: parent_block.hash,
+    //  data: '',
+    //  nonce: 0
+  //  }
 
     chain.push(block);
     io.emit('fetchBlockchain', chain);
