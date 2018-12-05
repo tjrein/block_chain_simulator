@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import AddBlockModal from './AddBlockModal';
 import sha256 from 'crypto-js/sha256';
 import Block from './Block';
 import { Button, Container, Divider, Segment } from 'semantic-ui-react';
@@ -55,7 +56,7 @@ class BlockChain extends Component {
     this.socket.emit('updateBlockchain', newChain);
   }
 
-  addBlock = () => this.socket.emit('addBlock');
+  addBlock = (data) => this.socket.emit('addBlock', data);
 
   render () {
     const blocks = this.state.chain.map((block, index) =>
@@ -75,11 +76,7 @@ class BlockChain extends Component {
     return (
       <div>
         {blocks}
-        <Container>
-          <Button size="big" onClick={this.addBlock}>
-            Add Block
-          </Button>
-        </Container>
+        <AddBlockModal addBlock={this.addBlock}/>
       </div>
     )
   }
