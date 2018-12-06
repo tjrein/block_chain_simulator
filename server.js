@@ -10,24 +10,36 @@ const io = require('socket.io')(server);
 
 
 let connections = [];
-let chain = [ new Block(1, "This is a test", "000") ];
+let chain = [ new Block(1, "Genesis block", "0000000000000000000000000000000000000000000000000000000000000000") ];
+let difficulty = "000"
 
 io.on('connection', socket => {
   connections.push(socket);
 
-  socket.emit("fetchBlockchain", chain);
+  socket.emit("fetchBlockchain", chain, difficulty);
 
-  socket.on('addBlock', (data) => {
+  socket.on('addBlock', data => {
     const parent_block = chain[chain.length -1]
     let block = new Block(parent_block.id + 1, data, parent_block.hash);
     chain.push(block);
-    io.emit('fetchBlockchain', chain);
+    io.emit('fetchBlockchain', chain, difficulty);
+  });
+
+  socket.on('updateDifficulty', new_difficulty => {
+    difficulty = new_difficulty;
+    io.emit('fetchBlockchain', chain, difficulty)
+
   });
 
   socket.on('updateBlockchain', data => {
     chain = data;
-    socket.broadcast.emit('fetchBlockchain', data);
+    socket.broadcast.emit('fetchBlockchain', data, difficulty);
   });
+
+  //socket.on('mineBlock', (difficulty, index)  => {
+  //  let block = { ...this.state.chain[index] };
+
+  //}
 
   socket.on('disconnect', reason => {
     let index = connections.indexOf(socket);

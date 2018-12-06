@@ -1,20 +1,26 @@
 import React, { Component } from 'react';
-import AddBlockModal from './AddBlockModal';
+import FormModal from './FormModal';
 import sha256 from 'crypto-js/sha256';
 import Block from './Block';
-import { Button, Container, Divider, Segment } from 'semantic-ui-react';
+import { Button, Container, Divider, Segment, Grid, Header } from 'semantic-ui-react';
 import io from 'socket.io-client';
 import update from 'immutability-helper';
 
 class BlockChain extends Component {
   constructor(props) {
     super(props)
-    this.state = { chain: [], difficulty: "000" }
-    this.socket = io()
-  }
+    this.state = {
+      chain: [],
+      difficulty: "000",
+      addBlock_open: false,
+      difficulty_open: false,
+     }
 
-  componentDidMount() {
-    this.socket.on('fetchBlockchain', chain => this.setState({chain:chain}));
+    this.socket = io()
+
+    this.socket.on('fetchBlockchain', (chain, difficulty) => {
+      this.setState({chain:chain, difficulty:difficulty})
+    })
   }
 
   handleChange = (index, e) => {
@@ -56,27 +62,57 @@ class BlockChain extends Component {
     this.socket.emit('updateBlockchain', newChain);
   }
 
-  addBlock = (data) => this.socket.emit('addBlock', data);
+  openModal = e => this.setState({[e.target.name]: true});
+
+  closeModal = () => this.setState({addBlock_open: false, difficulty_open: false});
+
+  updateDifficulty = (difficulty) => {
+    this.closeModal();
+    this.socket.emit('updateDifficulty', difficulty)
+  }
+
+  addBlock = (data) => {
+    this.closeModal();
+    this.socket.emit('addBlock', data);
+  }
 
   render () {
     const blocks = this.state.chain.map((block, index) =>
-      <Container>
-        <Segment compact>
+      <Grid.Row columns={1}>
         <Block
           {...block}
           difficulty = {this.state.difficulty}
           handleChange={this.handleChange.bind(this, index)}
           mineBlock={this.mineBlock.bind(this, index)}
         />
-        </Segment>
         <Divider hidden />
-      </Container>
+      </Grid.Row>
     );
 
     return (
       <div>
-        {blocks}
-        <AddBlockModal addBlock={this.addBlock}/>
+      <Container>
+        <Header as="h1" dividing> Blockchain Simulator </Header>
+          <Button primary circular size="big" name="addBlock_open" onClick={this.openModal}> Add Block </Button>
+          <Button primary circular size="big" name="difficulty_open" onClick={this.openModal}> Change Difficulty </Button>
+          <Divider hidden />
+       </Container>
+        <Grid centered>
+          {blocks}
+        </Grid>
+        <FormModal
+          name="addBlock"
+          open={this.state.addBlock_open}
+          data={this.state.submit_data}
+          closeCallback={this.closeModal}
+          confirmCallback={this.addBlock}/>
+        <FormModal name="difficulty"
+          name="difficulty"
+          initial_value={this.state.difficulty}
+          data={this.state.submit_data}
+          open={this.state.difficulty_open}
+          closeCallback={this.closeModal}
+          confirmCallback={this.updateDifficulty}/>
       </div>
     )
   }
