@@ -19,7 +19,11 @@ class FormModal extends Component {
     this.props.closeCallback();
   }
 
-  confirm = () => this.props.confirmCallback(this.state.data);
+  confirm = () => {
+    let submit_data = this.state.data;
+    this.setState({data: ""});
+    this.props.confirmCallback(submit_data);
+  }
 
   render () {
     let name = this.props.name
