@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import Block from './components/Block';
 import BlockChain from './components/BlockChain';
 
 class App extends Component {

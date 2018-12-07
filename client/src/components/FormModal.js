@@ -1,22 +1,18 @@
 import React, { Component } from 'react'
-import { Button, Modal, TextArea, Form } from 'semantic-ui-react'
+import { Button, Modal,  Form } from 'semantic-ui-react'
 
 class FormModal extends Component {
 
   state = {data: ""}
 
   componentDidMount() {
-    console.log("This shit" , this.props)
     let initial_value = this.props.initial_value || "";
     this.setState((state, props) => ({
        data: initial_value
     }));
   }
 
-  handleChange = e => {
-    let data = e.target.value;
-    this.setState({data: e.target.value})
-  }
+  handleChange = e => this.setState({data: e.target.value})
 
   close = () => {
     this.setState({data: this.props.initial_value});
