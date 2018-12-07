@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import FormModal from './FormModal';
 import sha256 from 'crypto-js/sha256';
 import Block from './Block';
-import { Button, Container, Divider, Segment, Grid, Header } from 'semantic-ui-react';
+import { Button, Container, Divider, Grid, Header } from 'semantic-ui-react';
 import io from 'socket.io-client';
 import update from 'immutability-helper';
 
@@ -53,7 +53,7 @@ class BlockChain extends Component {
     for (let i = index + 1; i < newChain.length; i++) {
       let newBlock = {...newChain[i]};
       let parent_block = {...newChain[i-1]} || null
-      newBlock.previous_hash = parent_block && parent_block.hash || null;
+      newBlock.previous_hash = (parent_block && parent_block.hash) || null;
       newBlock.hash = sha256(newBlock.previous_hash + newBlock.data + newBlock.nonce).toString();
       newChain = update(newChain, { [i]: {$set: newBlock} });
     }
@@ -106,7 +106,7 @@ class BlockChain extends Component {
           data={this.state.submit_data}
           closeCallback={this.closeModal}
           confirmCallback={this.addBlock}/>
-        <FormModal name="difficulty"
+        <FormModal
           name="difficulty"
           initial_value={this.state.difficulty}
           data={this.state.submit_data}

@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { Form, Button, Container, Header, Segment } from 'semantic-ui-react';
-import sha256 from 'crypto-js/sha256';
 
 class Block extends Component {
 
   validHash = (hash, difficulty) => hash.substring(0, difficulty.length) === difficulty
 
   render () {
-    const {data, hash, nonce, previous_hash, difficulty} = this.props;
+    const {hash, previous_hash, difficulty} = this.props;
     let hash_color = this.validHash(hash, difficulty) ? "green" : "red";
     let parent_color = this.validHash(previous_hash, difficulty) ? "green" : "red";
     let status = hash_color === "green" && parent_color === "green" ? "green" : "red";
